@@ -55,3 +55,49 @@ p + geom_point(alpha = (1/3), size = 3) + geom_smooth(lwd = 3, se = FALSE)
 p + geom_point(alpha = (1/3), size = 3) + facet_wrap(~ continent) +
   geom_smooth(lwd = 1.5, se = FALSE)
 #> `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+
+#Use of filter instead of subsetting
+
+filter(gapminder, lifeExp < 29)
+filter(gapminder, country == "Rwanda", year > 1979)
+filter(gapminder, country %in% c("Rwanda", "Afghanistan"))
+
+#Pipes
+
+gapminder %>%
+  filter(country == "Cambodia") %>%
+  select(year, lifeExp)
+
+
+(my_gap <- gapminder)
+
+## let output print to screen, but do not store
+my_gap %>% filter(country == "Canada")
+
+
+#Use mutate() to add new variables
+my_gap %>%
+  mutate(gdp = pop * gdpPercap)
+
+
+ctib <- my_gap %>%
+  filter(country == "Canada")
+## this is a semi-dangerous way to add this variable
+## I'd prefer to join on year, but we haven't covered joins yet
+my_gap <- my_gap %>%
+  mutate(tmp = rep(ctib$gdpPercap, nlevels(country)),
+         gdpPercapRel = gdpPercap / tmp,
+         tmp = NULL)
+
+my_gap %>% 
+  filter(country == "Canada") %>% 
+  select(country, year, gdpPercapRel)
+
+summary(my_gap$gdpPercapRel)
+
+#arrange
+
+my_gap %>%
+  filter(year == 2007) %>%
+  arrange(desc(lifeExp))
