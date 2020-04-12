@@ -101,3 +101,52 @@ summary(my_gap$gdpPercapRel)
 my_gap %>%
   filter(year == 2007) %>%
   arrange(desc(lifeExp))
+
+#select
+
+my_gap %>%
+  filter(country == "Burundi", year > 1996) %>% 
+  select(yr = year, lifeExp, gdpPercap) %>% 
+  select(gdpPercap, everything())
+
+#group by
+my_gap %>%
+  group_by(continent) %>%
+  summarize(n = n(),
+            n_countries = n_distinct(country))
+
+#summarization
+my_gap %>%
+  filter(year %in% c(1952, 2007)) %>%
+  group_by(continent, year) %>%
+  summarize_at(vars(lifeExp, gdpPercap), list(~mean(.), ~median(.)))
+
+#grouped mutate
+
+my_gap %>% 
+  group_by(country) %>% 
+  select(country, year, lifeExp) %>% 
+  mutate(lifeExp_gain = lifeExp - first(lifeExp)) %>% 
+  filter(year < 1963)
+
+#window functions
+my_gap %>%
+  filter(continent == "Asia") %>%
+  select(year, country, lifeExp) %>%
+  group_by(year) %>%
+  filter(min_rank(desc(lifeExp)) < 2 | min_rank(lifeExp) < 2) %>% 
+  arrange(year) %>%
+  print(n = Inf)
+
+
+my_gap %>%
+  select(country, year, continent, lifeExp) %>%
+  group_by(continent, country) %>%
+  ## within country, take (lifeExp in year i) - (lifeExp in year i - 1)
+  ## positive means lifeExp went up, negative means it went down
+  mutate(le_delta = lifeExp - lag(lifeExp)) %>% 
+  ## within country, retain the worst lifeExp change = smallest or most negative
+  summarize(worst_le_delta = min(le_delta, na.rm = TRUE)) %>% 
+  ## within continent, retain the row with the lowest worst_le_delta
+  top_n(-1, wt = worst_le_delta) %>% 
+  arrange(worst_le_delta)
