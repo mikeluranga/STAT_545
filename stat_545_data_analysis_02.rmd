@@ -1,0 +1,34 @@
+---
+title: "stat_545_data_analysis_02"
+author: "Mikel Uranga"
+date: "12/4/2020"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(gapminder)
+```
+
+
+```{r}
+gap_asia_2007 <- gapminder %>% filter(year == 2007, continent == "Asia")
+ggplot(gap_asia_2007, aes(x = lifeExp, y = country)) + geom_point()
+ggplot(gap_asia_2007, aes(x = lifeExp, y = fct_reorder(country, lifeExp))) +
+  geom_point()
+```
+
+```{r}
+h_countries <- c("Egypt", "Haiti", "Romania", "Thailand", "Venezuela")
+h_gap <- gapminder %>%
+  filter(country %in% h_countries) %>% 
+  droplevels()
+ggplot(h_gap, aes(x = year, y = lifeExp, color = country)) +
+  geom_line()
+ggplot(h_gap, aes(x = year, y = lifeExp,
+                  color = fct_reorder2(country, year, lifeExp))) +
+  geom_line() +
+  labs(color = "country")
+
+```
+
