@@ -2,7 +2,9 @@
 title: "stat_545_data_analysis_02"
 author: "Mikel Uranga"
 date: "12/4/2020"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ```{r}
